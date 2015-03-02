@@ -70,7 +70,7 @@ def processnetworks(xml_dir):
                 network_type = network.get('type')
                 if network_type == 'probe': continue
                 # set default values
-                networks.append({'type':'n/a','bssid':'n/a','essid':'n/a','lat':'0','long':'0'})
+                networks.append({'type':'n/a','bssid':'n/a','essid':'n/a','lat':'0','long':'0','encryption':'na'})
                 networks[-1]['type'] = network_type
               
                 for network_detail in network:
@@ -78,6 +78,8 @@ def processnetworks(xml_dir):
                         for child_network in network_detail:
                             if child_network.tag == 'essid':
                                 networks[-1]['essid'] = child_network.text
+                            if child_network.tag == 'encryption' and networks[-1]['encryption'] == 'na':
+                                networks[-1]['encryption'] = child_network.text
                     if network_detail.tag == 'BSSID':
                         networks[-1]['bssid'] = network_detail.text
                         #retrieve latlong
@@ -87,6 +89,7 @@ def processnetworks(xml_dir):
                             continue # skips rest of the for loop and goes to next iteration
                         networks[-1]['lat'] = new_lat
                         networks[-1]['long'] = new_long
+
     return networks
 
 def print_nets(networks):
@@ -146,7 +149,12 @@ if __name__ == "__main__":
     # Create Google map of networks
     mymap = pygmaps.maps(networks[0]['lat'],networks[0]['long'], 8)
     for e in networks:
-        mymap.addpoint(e['lat'],e['long'],color = "#FF0000",title = e['essid'])
+        if e['encryption'] == 'none':
+            mymap.addpoint(e['lat'],e['long'],color = "#FF0000",title = e['essid'])
+        elif e['encryption'] == 'WEP':
+            mymap.addpoint(e['lat'],e['long'],color = "#0000FF",title = e['essid'])
+        else:
+            mymap.addpoint(e['lat'],e['long'],color = "#00FF00",title = e['essid'])
     mymap.draw('./'+output_file)
     output_file = os.path.abspath(output_file)
     print "File written to:", output_file
