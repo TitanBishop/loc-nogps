@@ -149,7 +149,7 @@ if __name__ == "__main__":
     # Create Google map of networks
     mymap = pygmaps.maps(networks[0]['lat'],networks[0]['long'], 8)
     for e in networks:
-        if e['encryption'] == 'none':
+        if e['encryption'] == 'None':
             mymap.addpoint(e['lat'],e['long'],color = "#FF0000",title = e['essid'])
         elif e['encryption'] == 'WEP':
             mymap.addpoint(e['lat'],e['long'],color = "#0000FF",title = e['essid'])
